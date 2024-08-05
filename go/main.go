@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"promise/promise"
+	"time"
 )
 
 func main() {
@@ -11,7 +12,10 @@ func main() {
 	j := 9
 	fmt.Println(p)
 	p.OnComplete(testFunc)
+
+	time.Sleep(1 * time.Second)
 	p.Complete(&j)
+	fmt.Println(p)
 }
 
 func testFunc(i *int) {

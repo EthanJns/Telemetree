@@ -2,6 +2,7 @@ package promise
 
 type Promise[T any] struct {
 	OnComplete     func(func(t *T))
+	OnSuccess		func(func(t *T))
 	OnFailure      func(func(s string))
 	callOnComplete func(t *T)
 	callOnFailure  func(s string)
@@ -14,7 +15,7 @@ func Create[T any]() *Promise[T] {
 	p := Promise[T]{OnComplete: nil, OnSuccess: nil, OnFailure: nil, Complete: nil, IsCompleted: false}
 	p.OnComplete = func(f func(t *T)) { onComplete(&p, f) }
 	p.OnFailure = func(f func(s string)) { onFailure(&p, f) }
-	p.Complete = func(t *T) { p.callOnComplete(t) }
+	p.Complete = func(t *T) { complete(&p, t) }
 	p.Fail = func(s string) { p.callOnFailure(s) }
 	return &p
 }
@@ -25,4 +26,11 @@ func onComplete[T any](p *Promise[T], callOnComplete func(t *T)) {
 
 func onFailure[T any](p *Promise[T], callOnFailure func(s string)) {
 	p.callOnFailure = callOnFailure
+}
+
+func complete[T any](p *Promise[T], t *T) {
+	p.IsCompleted = true
+	if p.callOnComplete != nil {
+		p.callOnComplete(t)
+	}
 }
